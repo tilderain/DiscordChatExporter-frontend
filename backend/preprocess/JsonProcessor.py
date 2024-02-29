@@ -43,7 +43,7 @@ class JsonProcessor:
 		does not contain messages
 		"""
 		channel["_id"] = pad_id(channel.pop("id"))
-		channel["categoryId"] = pad_id(channel["categoryId"])
+		#channel["categoryId"] = pad_id(channel["categoryId"])
 		channel["guildId"] = guild_id
 		return channel
 
@@ -63,9 +63,9 @@ class JsonProcessor:
 				if "roles" in message["author"]:
 					for role in message["author"]["roles"]:
 						role["_id"] = pad_id(role.pop("id"))
-			if "stickers" in message:
-				for sticker in message["stickers"]:
-					sticker["_id"] = pad_id(sticker.pop("id"))
+			#if "stickers" in message:
+			#	for sticker in message["stickers"]:
+			#		sticker["_id"] = pad_id(sticker.pop("id"))
 			if "mentions" in message:
 				for mention in message["mentions"]:
 					mention["_id"] = pad_id(mention.pop("id"))
@@ -88,8 +88,8 @@ class JsonProcessor:
 			if len(message["mentions"]) == 0:
 				del message["mentions"]
 
-			if len(message["stickers"]) == 0:
-				del message["stickers"]
+			#if len(message["stickers"]) == 0:
+			#	del message["stickers"]
 
 			if len(message["reactions"]) == 0:
 				del message["reactions"]
@@ -209,9 +209,9 @@ class JsonProcessor:
 
 				message["attachments"] = new_attachments
 
-			if "stickers" in message:
-				for sticker in message["stickers"]:
-					sticker["source"] = self.asset_processor.process(sticker.pop("sourceUrl"), is_searchable=False)
+			#if "stickers" in message:
+			#	for sticker in message["stickers"]:
+			#		sticker["source"] = self.asset_processor.process(sticker.pop("sourceUrl"), is_searchable=False)
 
 		return messages
 
@@ -233,20 +233,13 @@ class JsonProcessor:
 				message["author"] = author
 
 
-				# extract all authors for search
-				if author_copy["_id"] in authors:
-					# save new nickname if different. Ignore null nicknames (discordless exports)
-					if message["author"]["nickname"] not in authors[author_copy["_id"]]["nicknames"] and message["author"]["nickname"] != None:
-						authors[author["_id"]]["nicknames"].append(message["author"]["nickname"])
-					continue
-
 				author_copy["guildIds"] = [guild_id]
 				author_copy["avatar"] = self.asset_processor.process(author_copy.pop("avatarUrl"), is_searchable=False)
 				author_copy["names"] = [author_copy.pop("name") + "#" + author_copy.pop("discriminator")]
 				authors[author_copy["_id"]] = author_copy  # new author
 
-				author_copy["nicknames"] = [author_copy.pop("nickname")]
-				author_copy["nicknames"] = list(filter(None, author_copy["nicknames"]))   # remove null nicknames (discordless exports)
+				#author_copy["nicknames"] = [author_copy.pop("nickname")]
+				#author_copy["nicknames"] = list(filter(None, author_copy["nicknames"]))   # remove null nicknames (discordless exports)
 
 		# dictionary to list
 		authors_list = []
@@ -335,14 +328,14 @@ class JsonProcessor:
 
 		# merge new author with existing author
 		guildIds = list(set(author["guildIds"] + database_author["guildIds"]))
-		nicknames = list(set(author["nicknames"] + database_author["nicknames"]))
+		#nicknames = list(set(author["nicknames"] + database_author["nicknames"]))
 		names = list(set(author["names"] + database_author["names"]))
 
 		# update guildIds and nicknames in database
 		self.collections["authors"].update_one({"_id": author["_id"]}, {
 			"$set": {
 				"guildIds": guildIds,
-				"nicknames": nicknames,
+				#"nicknames": nicknames,
 				"names": names
 			}
 		})
